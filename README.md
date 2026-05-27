@@ -68,6 +68,7 @@ The FPGA asserts an interrupt whenever a new PCM sample is available.
 - Startup synchronization issue resolved
 - Decimation and PCM extraction verified
 - Interface FPGA and MCU using SPI protocol
+- Debug the PCM input using MATLAB
 - Verify the interface by driving sample audio through the MCU
 
 ## References
