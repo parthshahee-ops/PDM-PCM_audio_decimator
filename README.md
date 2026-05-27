@@ -18,7 +18,14 @@ This allows real-time audio decimation with very low FPGA utilization.
 - **1-bit 2 MHz PDM**
 → into → **16-bit PCM at 32 kHz**
 
+## System Architecture
+
 ## Hardware Architecture
+### Hardware Requirements
+| Component | Purpose |
+|-----------|----------|
+| Shrike Lite | Main FPGA + MCU development platform |
+| PDM MEMS Microphone Breakout Board | Captures PDM audio input signals |
 
 ### FPGA Fabric
 - Generates the 2 MHz audio clock
@@ -36,7 +43,7 @@ The entire processing chain uses less than 40% of the FPGA fabric.
 
 The FPGA asserts an interrupt whenever a new PCM sample is available.
 
-## Project Phases
+## Project Flow
 
 ### Stage 1
 - Pure RTL behavioral simulation
@@ -53,14 +60,17 @@ The FPGA asserts an interrupt whenever a new PCM sample is available.
 - Real-time standalone audio decimation
 - Digital stethoscope style implementation
 
-## Current Status
+## Development Flow
 
-- [x] CIC RTL implementation completed
-- [x] Behavioral simulation operational
-- [x] Startup synchronization issue resolved
-- [x] Decimation and PCM extraction verified
-- [ ] Interface FPGA and MCU using SPI protocol
-- [ ] Verify the interface by driving sample audio through the MCU
+- CIC RTL implementation completed
+- Behavioral simulation operational
+- Startup synchronization issue resolved
+- Decimation and PCM extraction verified
+- Interface FPGA and MCU using SPI protocol
+- Verify the interface by driving sample audio through the MCU
 
+## References
+- IEEE Xplore: [PDM Audio Signal Processing Using FPGA and MCU](https://ieeexplore.ieee.org/document/10153161)
+- IEEE Xplore: [Real-Time FPGA-Based Audio Processing System](https://ieeexplore.ieee.org/document/11385174)
 ---
 
