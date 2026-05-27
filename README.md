@@ -19,6 +19,7 @@ This allows real-time audio decimation with very low FPGA utilization.
 → into → **16-bit PCM at 32 kHz**
 
 ## System Architecture
+![System Architecture](assets/System%20Architecture)
 
 ## Hardware Architecture
 ### Hardware Requirements
