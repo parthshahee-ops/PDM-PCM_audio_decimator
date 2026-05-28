@@ -44,6 +44,38 @@ The entire processing chain uses less than 40% of the FPGA fabric.
 
 The FPGA asserts an interrupt whenever a new PCM sample is available.
 
+## Folder Structure
+
+```text id="4fh8t1"
+PDM-PCM_audio_decimator/
+│
+├── Simulation/
+│   ├── Source Files
+│   ├── Testbenches
+│   ├── Output Waveform 
+│   └── .vcd files
+│
+├── SPI_Interface/
+│   ├── SPI communication modules
+│   ├── SPI loopback verification logic
+│   └── RP2040 SPI receiver script
+│
+├── PDM_PCM_8bit/
+│   ├── 8-bit PDM-to-PCM conversion pipeline
+│   ├── RP2040 receiver script
+│   └── MATLAB script
+│
+├── PDM_PCM_16bit/
+│   ├── 16-bit PDM-to-PCM conversion pipeline
+│   ├── RP2040 receiver script
+│   └── MATLAB script
+│
+├── README.md
+└── .gitignore
+```
+
+
+
 ## Project Flow
 
 ### Stage 1
