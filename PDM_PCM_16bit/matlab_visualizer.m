@@ -1,28 +1,15 @@
-%==========================================================================
-% Verified Real-Time 16-Bit PCM Stream Visualizer & Synced Plotter
-%==========================================================================
 clear; clc; close all;
-
-%--------------------------------------------------------------------------
-% 1. HARDWARE ENVIRONMENT CONFIGURATION
-%--------------------------------------------------------------------------
 com_port = "COM4"; 
 baud_rate = 115200; 
 
-% Size of the live moving history window on your chart
 max_samples = 50; 
 pcm_buffer = zeros(1, max_samples);
 
-%--------------------------------------------------------------------------
-% 2. SERIAL PORT ESTABLISHMENT
-%--------------------------------------------------------------------------
 fprintf("Opening data connection gateway on %s...\n", com_port);
 s = serialport(com_port, baud_rate);
 configureTerminator(s, "LF"); % Split packets cleanly at every newline (\n)
 
-%--------------------------------------------------------------------------
-% 3. GRAPHICAL CANVAS SELECTION & STYLING
-%--------------------------------------------------------------------------
+
 figure('Name', 'FPGA Real-Time 16-Bit Waveform Tracker', 'NumberTitle', 'off');
 h_plot = plot(pcm_buffer, 'LineWidth', 2.5, 'Color', [0 0.4470 0.7410]);
 grid on;
@@ -38,9 +25,6 @@ ylabel('Amplitude');
 fprintf("=== Stream Connected! Plotting synced data curves... ===\n");
 flush(s); % Clear any stale byte clutter out of the serial cache
 
-%--------------------------------------------------------------------------
-% 4. REAL-TIME SYNCED PROCESSING LOOP
-%--------------------------------------------------------------------------
 while ishandle(h_plot)
     if s.NumBytesAvailable > 0
         % Read the text line straight from your print statement output
