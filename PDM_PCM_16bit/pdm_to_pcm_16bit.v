@@ -4,17 +4,15 @@
 module top ( 
     (* iopad_external_pin, clkbuf_inhibit *) input clk,     // Master System Clock (50MHz)
     (* iopad_external_pin *) output clk_en, 
-    (* iopad_external_pin *) input rst_n,                   // Active-Low Reset (PIN 9)
+    (* iopad_external_pin *) input rst_n,                  
     
-    // Physical Audio Stream Input Trace
-    (* iopad_external_pin *) input PDM,                     // Isolated during loopback test
+    (* iopad_external_pin *) input PDM,                    
     
-    // Physical SPI Pins mapped directly to your validated board tracks
-    (* iopad_external_pin *) input spi_ss_n,                // CS  (PIN 17)
-    (* iopad_external_pin *) input spi_sck,                 // SCK (PIN 16)
-    (* iopad_external_pin *) input spi_mosi,                // MOSI (PIN 18)
-    (* iopad_external_pin *) output spi_miso,               // MISO (PIN 19)
-    (* iopad_external_pin *) output spi_miso_en             // MISO OE Pad Link
+    (* iopad_external_pin *) input spi_ss_n,                
+    (* iopad_external_pin *) input spi_sck,                 
+    (* iopad_external_pin *) input spi_mosi,                
+    (* iopad_external_pin *) output spi_miso,               
+    (* iopad_external_pin *) output spi_miso_en             
 );
 
     assign clk_en = 1'b1; // Power up core oscillator module
@@ -24,17 +22,12 @@ module top (
     wire [15:0] rx_data_wire;   
     wire        rx_valid_pulse; 
     wire        rst = ~rst_n; 
-
-    //---------------------------------------------------------
+	
     // STAGE 1: 3-Stage Pipelined High-Speed Integrators
-    //---------------------------------------------------------
-    // Expanded to 25 bits to handle the theoretical maximum bit growth of R=8 safely
     reg signed [24:0] A1, A2, A3;
     
-    // Sign-extend the incoming 16-bit test word up to 25 bits safely
     wire signed [24:0] extended_rx_data = {{9{rx_data_wire[15]}}, rx_data_wire};
 
-    // BREAK CRITICAL TIMING PATH: Every integrator accumulates its own registered history 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             A1 <= 25'sh0;
@@ -47,9 +40,7 @@ module top (
         end
     end
 
-    //---------------------------------------------------------
     // STAGE 2: Decimation/Sampling (R = 8 Downsampling)
-    //---------------------------------------------------------
     reg [2:0] count;
     reg       first_cycle;
     wire      wait_ack = (count == 3'd7);
@@ -66,9 +57,7 @@ module top (
         end
     end
 
-    //---------------------------------------------------------
     // STAGE 3: 3-Stage Differentiators & SPI Output Register
-    //---------------------------------------------------------
     reg signed [24:0] C1_z1, C2_z2, C3_z3;
     wire signed [24:0] C1_wire = A3 - C1_z1;
     wire signed [24:0] C2_wire = C1_wire - C2_z2;
@@ -85,14 +74,10 @@ module top (
             C2_z2 <= C1_wire;
             C3_z3 <= C2_wire;
             
-            // Map the stabilized filtered 16-bit PCM data segment back to the output register
 			tx_data_reg <= C3_wire[15:0];
         end
     end
 
-    //---------------------------------------------------------
-    // FACTORY SPI TARGET TRANSCEIVER CORE INSTANTIATION
-    //---------------------------------------------------------
     spi_target #(
         .CPOL(1'b0),   
         .CPHA(1'b0),   
@@ -117,10 +102,6 @@ module top (
 
 endmodule
 
-
-//---------------------------------------------------------
-// REPAIRED SPI TARGET TRANSCEIVER IP CORE MODULE
-//---------------------------------------------------------
 module spi_target #(
   parameter CPOL   = 1'b0,  
   parameter CPHA   = 1'b0,  
@@ -142,8 +123,6 @@ module spi_target #(
 );
 
   reg               [2:0] r_ss_n_sync, r_sck_sync;
-  
-  //Secure 4-bit accurate hardware register layout (counts index 0 to 15 perfectly)
   reg [$clog2(WIDTH)-1:0] r_transmision_count;
   reg         [WIDTH-1:0] r_miso_data;
   wire                    w_sck_r_edge, w_sck_f_edge, w_sck_edge, w_sck_edge_op;
