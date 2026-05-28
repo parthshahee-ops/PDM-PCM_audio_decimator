@@ -1,0 +1,13 @@
+*.jou
+*.log
+*.str
+*.tmp
+.cache/
+.gen/
+.hw/
+.ip_user_files/
+.runs/
+*.bit
+*.wdb
+.DS_Store
+Thumbs.db
