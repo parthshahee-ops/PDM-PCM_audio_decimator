@@ -1,88 +1,54 @@
 clear; clc; close all;
 
-% COM port and baud rate parameters used for receiving live FPGA data.
-com_port  = "COM4";
-baud_rate = 115200;
+% Configuration Parameters
+com_port = "COM4";          % Change to your active USB-Serial port map
+baud_rate = 115200;         
+window_size = 100;          % Number of concurrent samples shown on screen
+pcm_history = zeros(1, window_size);
 
-% Number of samples maintained in the scrolling waveform history window.
-max_samples = 50;
-
-% Circular display buffer initialized with zeros.
-pcm_buffer = zeros(1, max_samples);
-
-% Port Initialization
-fprintf("Opening serial connection on %s...\n", com_port);
-
+fprintf("Opening serial gateway connection on %s...\n", com_port);
 s = serialport(com_port, baud_rate);
+configureTerminator(s, "LF"); 
 
-% Incoming data packets are separated using line Feed (\n).
-configureTerminator(s, "LF");
-
-% RT Port Initialization
-figure( ...
-    'Name', 'FPGA Real-Time PCM Waveform Monitor', ...
-    'NumberTitle', 'off');
-
-h_plot = plot( ...
-    pcm_buffer, ...
-    'LineWidth', 2.5, ...
-    'Color', [0 0.4470 0.7410]);
-
+% Setup Plot Canvas Architecture
+figure('Name', 'FPGA PDM-to-PCM Sine Wave Engine Telemetry', 'NumberTitle', 'off');
+h_plot = plot(pcm_history, 'LineWidth', 2.5, 'Color', [0 0.5 0.8]);
 grid on;
 ax = gca;
 
-% display range configured for signed 8-bit PCM values.
-ax.YLim = [-255 255];
+% Fit full-scale 16-bit signed PCM amplitude boundaries comfortably
+ax.YLim = [-35000, 35000]; 
+ax.XLim = [1, window_size];
+title('Live Decimated PCM Sine Wave Profile (R=8)');
+xlabel('Real-Time Sample Window');
+ylabel('Signed Amplitude (16-Bit Two''s Complement)');
 
-% horizontal axis represents the history window.
-ax.XLim = [1 max_samples];
+fprintf("=== Stream Synced! Plotting incoming dataset... ===\n");
+flush(s); 
 
-% zero-amplitude reference line.
-yline(0, '--k', 'Zero');
-
-title('Live FPGA PCM Output Stream');
-xlabel('Sample History Window');
-ylabel('Amplitude');
-
-fprintf("=== Stream Connected: Real-Time Plotting Started ===\n");
-
-% Removw any stale bytes accumulated before monitoring begins.
-flush(s);
-
-
-% RT Data Acquisation
+% Continuous Data Acquisition Engine
 while ishandle(h_plot)
-
-    % Process data only when bytes are available in the receive buffer.
     if s.NumBytesAvailable > 0
-
-        % Read a complete line from the serial stream.
         raw_line = readline(s);
-
-        % Extract signed numeric values following the "OUT:" tag.
+        
+        % Targeted Regex Pattern Matching to isolate 'OUT:XXXX'
         tokens = regexp(raw_line, 'OUT:(-?\d+)', 'tokens');
-
+        
         if ~isempty(tokens)
-
-            % Convert extracted text into numeric form.
             pcm_value = str2double(tokens{1}{1});
-
-            % Continue only if a valid number was received.
-            if ~isnan(pcm_value)
-
-                % Shift historical samples left and append the newest value.
-                pcm_buffer = [pcm_buffer(2:end), pcm_value];
-
-                % Update waveform data in the existing plot object.
-                set(h_plot, 'YData', pcm_buffer);
-
-                % Force immediate graphical refresh.
-                drawnow;
+            
+            % Validate that data point stays inside legitimate PCM boundaries
+            if ~isnan(pcm_value) && pcm_value >= -32768 && pcm_value <= 32767
+                % Advance historical buffer window
+                pcm_history = [pcm_history(2:end), pcm_value];
+                
+                % Update graphic coordinate data handle
+                set(h_plot, 'YData', pcm_history);
+                drawnow; 
             end
         end
     end
 end
 
-% SHUTDOWN
 clear s;
-fprintf("\nSerial port closed successfully.\n");
+fprintf("\nPort released cleanly.\n");
