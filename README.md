@@ -44,36 +44,36 @@ To overcome this constraint:
 
 ## Quick Start
 
-### FPGA
-
-1. Open `pcm_to_pdm.ffpga` in Go Configure Software Hub
-2. Click Synthesize → Generate Bitstream
-3. Output will be in `ffpga/build/`
-
-### RP2040
-
-1. Copy `rp2040_spi_audio_receiver.py` to the Thonny IDE
-2. Execute the script
-3. Verify serial output is being generated
-
-### MATLAB
-
-Run `realtime_pcm_plotter.m` to visualize incoming PCM samples in real time.
+1. Connect your Shrike board via USB
+2. Upload `bitstream/your_example.bin` using ShrikeFlash
+3. Copy `rp2040_spi_audio_receiver.py` to the Thonny IDE
+4. Execute the script
+5. Run `realtime_pcm_plotter.m` to visualize incoming PCM samples in real time.
+   Replace COM4 with the respective port number.
 
 ## Build From Source
 
 ### FPGA (Verilog)
 
-Source files are located in: `ffpga/src/`
+1. Open `pdmtopcm.ffpga` in Go Configure Software Hub
+2. Click Synthesize → Generate Bitstream
+3. Output will be in `ffpga/build/`
+
+### Firmware (Thonny IDE)
+1. Select your board (Raspberry Pi Pico or ESP32-S3)
+2. Upload `rp2040_spi_audio_receiver.py` in Thonny IDE
+
+### Firmware (MATLAB)
+1. Update `realtime_pcm_plotter.m` with the correct port number.
+2. Run the script
 
 Available implementations:
 
 | File                 | Description                      |
 | -------------------- | -------------------------------- |
 | `pdm_to_pcm_8bit.v`  | 8-bit PCM output implementation  |
-| `pdm_to_pcm_16bit.v` | 16-bit PCM output implementation |
+| `pdm_to_pcm.v`       | Final PCM output implementation  |
 | `spi_interface.v`    | SPI communication interface      |
-| `pcm_to_pdm`         | Final Implementation             |
 
 ### Simulation
 
@@ -106,7 +106,7 @@ The FPGA implements a CIC filter that:
 
 To verify output, two PCM implementations are provided:
 * 8-bit PCM output
-* 16-bit PCM output
+* 16-bit PCM output (Final Implementation)
 
 ### 3. SPI Transfer
 Generated PCM samples are serialized and transferred from the FPGA to the RP2040 via SPI.
@@ -122,11 +122,10 @@ The RP2040 forwards PCM samples to the host PC where MATLAB visualizes the wavef
 
 ![8-bit PCM Output](./images/matlab_output_8bit.png)
 
-### 16-bit PCM Output
+### Final PCM Output
 
-![16-bit PCM Output](./images/matlab_output_16bit.png)
+![16-bit PCM Output](./images/matlab_final_output.png)
 
-### Final Output
 
 The generated waveform should resemble the original input pattern, with the 16-bit implementation providing higher amplitude resolution.
 The final output resembles a sine waveform.
