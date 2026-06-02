@@ -3,7 +3,7 @@ import time
 import shrike
 
 print("Flashing unchanged FPGA bitstream core...")
-shrike.flash("FPGA_bitstream_MCU.bin")
+shrike.flash("pdm_to_pcm.bin")
 
 reset_pin = Pin(14, Pin.OUT, value=1)
 reset_pin.value(0)
