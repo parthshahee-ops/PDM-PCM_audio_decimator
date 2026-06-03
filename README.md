@@ -84,8 +84,7 @@ Available implementations:
 | File                 | Description                      |
 | -------------------- | -------------------------------- |
 | `pdm_to_pcm_8bit.v`  | 8-bit PCM output implementation  |
-| `pdm_to_pcm.v`       | Final PCM output implementation  |
-| `spi_interface.v`    | SPI communication interface      |
+| `pdm_to_pcm.v`       | Final 16-bit PCM output implementation  |
 
 ### Simulation
 
