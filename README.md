@@ -22,8 +22,8 @@ This allows real-time audio decimation with very low FPGA utilization.
 | Board                | Firmware                | Status     |
 | -------------------- | ----------------------- | ---------- |
 | Shrike Lite (RP2040) | `firmware/micropython/` | ✅ Tested   |
-| Shrike (RP2350)      | N/A                     | ⬜ Untested |
-| Shrike-fi (ESP32-S3) | N/A                     | ⬜ Untested |
+| Shrike (RP2350)      | `firmware/micropython/` | ⬜ Untested |
+| Shrike-fi (ESP32-S3) | `firmware/micropython/` | ⬜ Untested |
 
 ## Hardware Setup
 PDM MEMS Microphone Breakout Board is required to capture audio signals and convert them into PDM output.
