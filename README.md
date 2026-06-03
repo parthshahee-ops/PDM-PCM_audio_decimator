@@ -26,21 +26,33 @@ This allows real-time audio decimation with very low FPGA utilization.
 | Shrike-fi (ESP32-S3) | N/A                     | ⬜ Untested |
 
 ## Hardware Setup
+PDM MEMS Microphone Breakout Board is required to capture audio signals and convert them into PDM output.
 
-| Component | Purpose |
-|-----------|----------|
-| Shrike Lite | Main FPGA + MCU development platform |
-| PDM MEMS Microphone Breakout Board | Captures PDM audio input signals |
-| Jumper Cables | To connect Micropone with FPGA |
+## FPGA Pin Mapping 
 
-![System Architecture](./images/system_architecture.png)
+| FPGA GPIO Pin | Signal Name | Direction | Description              |
+| ------------- | ----------- | --------- | ------------------------ |
+| 3             | `spi_sck`   | Input     | SPI clock                |
+| 4             | `spi_ss_n`  | Input     | Chip select (active low) |
+| 5             | `spi_mosi`  | Input     | MOSI (receive)           |
+| 6             | `spi_miso`  | Output    | MISO (transmit)          |
+| 18            | `rst_n`     | Input     | Reset (active low)       |
+| 17            | `PDM`       | Input     | PDM bitstream from Microphone              |
+
+### RP2040 Connections
+
+| RP2040 Pin | Signal Name | Direction | Description               |
+| ---------- | ----------- | --------- | ------------------------- |
+| 2          | SCK         | Output    | SPI clock                 |
+| 1          | CS          | Output    | Chip select               |
+| 3          | MOSI        | Output    | Master output             |
+| 0          | MISO        | Input     | Master input              |
+| 14         | Reset       | Output    | Reset signal (active low) |
 
 The Shrike Lite board provides only six hardwired FPGA-to-MCU interconnect signals. Due to this limitation, PCM audio samples cannot be transferred using a wide parallel interface.
 To overcome this constraint:
 * FPGA operates as SPI Slave
 * RP2040 operates as SPI Master
-* FPGA serializes generated PCM samples
-* RP2040 periodically reads PCM data over SPI
 
 ## Quick Start
 
@@ -94,7 +106,7 @@ PDM-PCM Simulation
 
 ### 1. PDM Audio Capture
 
-The PDM microphone generates a high-frequency 1-bit PDM stream representing the audio waveform.
+The PDM microphone generates a high-frequency 1-bit PDM stream representing the audio waveform and sends the 1-bit bitstream to the FPGA fabric.
 
 ### 2. CIC Filtering and Decimation
 
@@ -110,10 +122,8 @@ To verify output, two PCM implementations are provided:
 
 ### 3. SPI Transfer
 Generated PCM samples are serialized and transferred from the FPGA to the RP2040 via SPI.
-![SPI Interface Simulation](./images/spi_inferface.png)
 
 ### 4. MATLAB Visualization
-
 The RP2040 forwards PCM samples to the host PC where MATLAB visualizes the waveform in real time.
 
 ## Expected Output
@@ -128,7 +138,7 @@ The RP2040 forwards PCM samples to the host PC where MATLAB visualizes the wavef
 
 
 The generated waveform should resemble the original input pattern, with the 16-bit implementation providing higher amplitude resolution.
-The final output resembles a sine waveform.
+Here, the final output resembles a sine waveform.
 
 ## References
 
